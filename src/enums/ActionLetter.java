@@ -8,9 +8,11 @@ public enum ActionLetter {
     E("e"),
     F("f"),
     G("g"),
-    H("h");
+    H("h"),
+    I("i"),
+    J("j");
 
-    private String value;
+    private final String value;
 
     ActionLetter(String value) {
         this.value = value;

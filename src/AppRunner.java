@@ -6,11 +6,11 @@ import util.UniversalArrayImpl;
 import java.util.Scanner;
 
 public class AppRunner {
-
     private final UniversalArray<Product> products = new UniversalArrayImpl<>();
-
     private final CoinAcceptor coinAcceptor;
-
+    private final BillAcceptor billAcceptor;
+    private final CardAcceptor cardAcceptor;
+    private static int mode = 0;
     private static boolean isExit = false;
 
     private AppRunner() {
@@ -23,10 +23,13 @@ public class AppRunner {
                 new Pistachios(ActionLetter.G, 130)
         });
         coinAcceptor = new CoinAcceptor(100);
+        billAcceptor = new BillAcceptor(1);
+        cardAcceptor = new CardAcceptor(10);
     }
 
     public static void run() {
         AppRunner app = new AppRunner();
+
         while (!isExit) {
             app.startSimulation();
         }
@@ -36,21 +39,38 @@ public class AppRunner {
         print("\nВ автомате доступны:");
         showProducts(products);
 
-        print("\nМонет на сумму: " + coinAcceptor.getAmount());
+        if (mode == 0) {
+            print("\nМонет на сумму: " + coinAcceptor.getAmount());
+        } else if (mode == 1) {
+            print("\nДенег: " + billAcceptor.getAmount());
+        } else if (mode == 2) {
+            print("\nБаланс карты: " + cardAcceptor.getAmount());
+        }
 
         UniversalArray<Product> allowProducts = new UniversalArrayImpl<>();
         allowProducts.addAll(getAllowedProducts().toArray());
         chooseAction(allowProducts);
-
     }
 
     private UniversalArray<Product> getAllowedProducts() {
         UniversalArray<Product> allowProducts = new UniversalArrayImpl<>();
+
         for (int i = 0; i < products.size(); i++) {
-            if (coinAcceptor.getAmount() >= products.get(i).getPrice()) {
-                allowProducts.add(products.get(i));
+            if (mode == 0) {
+                if (coinAcceptor.getAmount() >= products.get(i).getPrice()) {
+                    allowProducts.add(products.get(i));
+                }
+            } else if (mode == 1) {
+                if (billAcceptor.getAmount() >= products.get(i).getPrice()) {
+                    allowProducts.add(products.get(i));
+                }
+            } else if (mode == 2) {
+                if (cardAcceptor.getAmount() >= products.get(i).getPrice()) {
+                    allowProducts.add(products.get(i));
+                }
             }
         }
+
         return allowProducts;
     }
 
@@ -58,17 +78,51 @@ public class AppRunner {
         print(" a - Пополнить баланс");
         showActions(products);
         print(" h - Выйти");
+
+        if (mode == 0) {
+            print(" i - Сменить на деньгоприёмник (купюроприёмник)");
+            print(" j - Сменить на карто-приёмник");
+        } else if (mode == 1) {
+            print(" g - Сменить на монетоприёмник");
+            print(" j - Сменить на карто-приёмник");
+        } else if (mode == 2) {
+            print(" g - Сменить на монетоприёмник");
+            print(" i - Сменить на деньгоприёмник (купюроприёмник)");
+        }
+
         System.out.print("\nВведите действие: ");
         String action = fromConsole().substring(0, 1);
+
         try {
             for (int i = 0; i < products.size(); i++) {
                 if (products.get(i).getActionLetter().equals(ActionLetter.valueOf(action.toUpperCase()))) {
-                    coinAcceptor.setAmount(coinAcceptor.getAmount() - products.get(i).getPrice());
+                    if (mode == 0) {
+                        coinAcceptor.setAmount(coinAcceptor.getAmount() - products.get(i).getPrice());
+                    } else if (mode == 1) {
+                        billAcceptor.setAmount(billAcceptor.getAmount() - products.get(i).getPrice());
+                    } else if (mode == 2) {
+                        cardAcceptor.setAmount(cardAcceptor.getAmount() - products.get(i).getPrice());
+                    }
                     print("Вы купили " + products.get(i).getName());
                     break;
                 } else if ("a".equalsIgnoreCase(action)) {
                     System.out.print("Введите сумму пополнения: ");
-                    coinAcceptor.setAmount(coinAcceptor.getAmount() + Integer.parseInt(fromConsole()));
+                    if (mode == 0) {
+                        coinAcceptor.setAmount(coinAcceptor.getAmount() + Integer.parseInt(fromConsole()));
+                    } else if (mode == 1) {
+                        billAcceptor.setAmount(billAcceptor.getAmount() + Integer.parseInt(fromConsole()));
+                    } else if (mode == 2) {
+                        cardAcceptor.setAmount(cardAcceptor.getAmount() + Integer.parseInt(fromConsole()));
+                    }
+                    break;
+                } else if ("g".equalsIgnoreCase(action)) {
+                    mode = 0;
+                    break;
+                } else if ("i".equalsIgnoreCase(action)) {
+                    mode = 1;
+                    break;
+                } else if ("j".equalsIgnoreCase(action)) {
+                    mode = 2;
                     break;
                 } else if ("h".equalsIgnoreCase(action)) {
                     isExit = true;
@@ -79,8 +133,6 @@ public class AppRunner {
             print("Недопустимая буква. Попрбуйте еще раз.");
             chooseAction(products);
         }
-
-
     }
 
     private void showActions(UniversalArray<Product> products) {
