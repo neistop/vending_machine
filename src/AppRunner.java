@@ -33,7 +33,7 @@ public class AppRunner {
     }
 
     private void startSimulation() {
-        print("В автомате доступны:");
+        print("\nВ автомате доступны:");
         showProducts(products);
 
         print("\nМонет на сумму: " + coinAcceptor.getAmount());
@@ -55,14 +55,20 @@ public class AppRunner {
     }
 
     private void chooseAction(UniversalArray<Product> products) {
+        print(" a - Пополнить баланс");
         showActions(products);
         print(" h - Выйти");
+        System.out.print("\nВведите действие: ");
         String action = fromConsole().substring(0, 1);
         try {
             for (int i = 0; i < products.size(); i++) {
                 if (products.get(i).getActionLetter().equals(ActionLetter.valueOf(action.toUpperCase()))) {
                     coinAcceptor.setAmount(coinAcceptor.getAmount() - products.get(i).getPrice());
                     print("Вы купили " + products.get(i).getName());
+                    break;
+                } else if ("a".equalsIgnoreCase(action)) {
+                    System.out.print("Введите сумму пополнения: ");
+                    coinAcceptor.setAmount(coinAcceptor.getAmount() + Integer.parseInt(fromConsole()));
                     break;
                 } else if ("h".equalsIgnoreCase(action)) {
                     isExit = true;
