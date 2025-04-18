@@ -42,9 +42,9 @@ public class AppRunner {
         if (mode == 0) {
             print("\nМонет на сумму: " + coinAcceptor.getAmount());
         } else if (mode == 1) {
-            print("\nДенег: " + billAcceptor.getAmount());
+            print("\nДенег: " + (billAcceptor.getAmount()) / billAcceptor.getBillOnCoins());
         } else if (mode == 2) {
-            print("\nБаланс карты: " + cardAcceptor.getAmount());
+            print("\nБаланс карты: " + (cardAcceptor.getAmount()) / cardAcceptor.getCardBillOnCoins());
         }
 
         UniversalArray<Product> allowProducts = new UniversalArrayImpl<>();
@@ -110,9 +110,9 @@ public class AppRunner {
                     if (mode == 0) {
                         coinAcceptor.setAmount(coinAcceptor.getAmount() + Integer.parseInt(fromConsole()));
                     } else if (mode == 1) {
-                        billAcceptor.setAmount(billAcceptor.getAmount() + Integer.parseInt(fromConsole()));
+                        billAcceptor.setAmount(billAcceptor.getAmount() + (Integer.parseInt(fromConsole())) * billAcceptor.getBillOnCoins());
                     } else if (mode == 2) {
-                        cardAcceptor.setAmount(cardAcceptor.getAmount() + Integer.parseInt(fromConsole()));
+                        cardAcceptor.setAmount(cardAcceptor.getAmount() + (Integer.parseInt(fromConsole())) * cardAcceptor.getCardBillOnCoins());
                     }
                     break;
                 } else if ("g".equalsIgnoreCase(action)) {
